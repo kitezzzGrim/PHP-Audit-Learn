@@ -248,3 +248,78 @@ function getip()
 	return $onlineip = $match[0] ? $match[0] : 'unknown';
 }
 ```
+
+很多应用都会由于在获取IP的时候没有验证IP格式，导致该处存在IP注入漏洞。
+
+再往下看有SQL查询统一操作函数inserttable()以及updatetable()函数，大多数SQL语句执行回经过这里。
+
+```php
+function inserttable($tablename, $insertsqlarr, $returnid=0, $replace = false, $silent=0) {
+	global $db;
+	$insertkeysql = $insertvaluesql = $comma = '';
+	foreach ($insertsqlarr as $insert_key => $insert_value) {
+		$insertkeysql .= $comma.'`'.$insert_key.'`';
+		$insertvaluesql .= $comma.'\''.$insert_value.'\'';
+		$comma = ', ';
+	}
+	$method = $replace?'REPLACE':'INSERT';
+	// echo $method." INTO $tablename ($insertkeysql) VALUES ($insertvaluesql)", $silent?'SILENT':'';die;
+	$state = $db->query($method." INTO $tablename ($insertkeysql) VALUES ($insertvaluesql)", $silent?'SILENT':'');
+	if($returnid && !$replace) {
+		return $db->insert_id();
+	}else {
+	    return $state;
+	} 
+}
+```
+
+往下看有wheresql()函数,是where条件拼接的地方，可以看到参数都使用了单引号包含。
+
+```php
+function wheresql($wherearr='')
+{
+	$wheresql="";
+	if (is_array($wherearr))
+		{
+		$where_set=' WHERE ';
+			foreach ($wherearr as $key => $value)
+			{
+			$wheresql .=$where_set. $comma.$key.'="'.$value.'"';
+			$comma = ' AND ';
+			$where_set=' ';
+			}
+		}
+	return $wheresql;
+}
+```
+
+还有一个访问令牌生成的函数asyn_userkey()，拼接用户名、密码salt以及密码进行一次md5，访问的时候只要在GET参数的值里面加上生成的这个key即可验证是否有权限，被用在注册、找回密码等验证过程中，也就是我们能看到的找回密码链接里的key。
+
+```php
+function asyn_userkey($uid)
+{
+	global $db;
+	$sql = "select * from ".table('members')." where uid = '".intval($uid)."' LIMIT 1";
+	$user=$db->getone($sql);
+	return md5($user['username'].$user['pwd_hash'].$user['password']);
+}
+```
+
+### 查看配置文件
+
+配置文件的文件名通常都带有config的关键字。在upload全局搜索发现在data目录下有config.php配置文件。
+
+```
+<?php
+$dbhost   = "localhost";
+$dbname   = "qs";
+$dbuser   = "root";
+$dbpass   = "abcd1234";
+$pre    = "qs_";
+$QS_cookiedomain = '';
+$QS_cookiepath =  "/upload/";
+$QS_pwdhash = "jgaPVNN#xHpcoRbd";
+define('QISHI_CHARSET','gb2312');
+define('QISHI_DBCHARSET','GBK');
+?>
+```

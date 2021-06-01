@@ -1,6 +1,4 @@
 # PHP语法函数
-- [PHP引用&](#PHP引用&)
-
 ## PHP引用&
 - PHP 的引用允许你用两个变量来指向同一个内容
 ```
@@ -29,6 +27,12 @@ print_r(array_map("myfunction",$a));
 ```
 ## array_merge
 array_merge() 函数用于把一个或多个数组合并为一个数组
+
+## getenv
+gentenv(参数)函数 是一个用于获取环境变量的函数，根据提供不同的参数可以获取不同的环境变量。
+
+## strcasecmp
+strcasecmp() 函数比较两个字符串，相等返回0，大于返回正数，小于返回负数。
 ## strip_tags
 strip_tags() 函数剥去字符串中的 HTML、XML 以及 PHP 的标签。
 ## str_replace
