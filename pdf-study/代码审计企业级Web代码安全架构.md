@@ -323,3 +323,177 @@ define('QISHI_CHARSET','gb2312');
 define('QISHI_DBCHARSET','GBK');
 ?>
 ```
+
+这儿可能存在双引号解析代码执行漏洞，通常这个配置是在安装系统的时候设置的，当然后台可能也有设置的地方，此外，有一个点QSISHI_DBCHARSET常量，配置的数据库编码是GBK，因此可能存在gbk宽字节注入。不过需要看数据库连接时设置的编码，骑士cms连接MySQL的代码在include\myclass.php文件的connect函数:
+```php
+    function connect($dbhost, $dbuser, $dbpw, $dbname = '', $dbcharset = 'gbk', $connect=1){
+    	$func = empty($connect) ? 'mysql_pconnect' : 'mysql_connect';
+    	if(!$this->linkid = @$func($dbhost, $dbuser, $dbpw, true)){
+    		$this->dbshow('Can not connect to Mysql!');
+    	} else {
+    		if($this->dbversion() > '4.1'){
+    			mysql_query( "SET NAMES gbk");
+    			if($this->dbversion() > '5.0.1'){
+    				mysql_query("SET sql_mode = ''",$this->linkid);
+					mysql_query("SET character_set_connection=".$dbcharset.", character_set_results=".$dbcharset.", character_set_client=binary", $this->linkid);
+    			}
+    		}
+    	}
+    	if($dbname){
+    		if(mysql_select_db($dbname, $this->linkid)===false){
+    			$this->dbshow("Can't select MySQL database($dbname)!");
+    		}
+    	}
+    }
+```
+
+这段代码有个关键的地方，见中间，代码首先判断MySQL版本是否大于4.1,如果是则执行以下代码：
+```php
+mysql_query( "SET NAMES gbk");
+```
+
+执行完这段语句后再判断MySQL版本是否大于5.0.1，如果是则执行以下代码：
+```php
+mysql_query("SET sql_mode = ''",$this->linkid);
+mysql_query("SET character_set_connection=".$dbcharset.", character_set_results=".$dbcharset.", character_set_client=binary", $this->linkid);
+```
+
+也就是说在MySQL版本小于5的情况下不会执行该语句，但之前已经执行了set names gbk，等同于
+SET character_set_connection='gbk', character_set_results='gbk', character_set_client='gbk'
+
+所以在MySQL版本大于4.1小于5的情况下，基本所有跟数据库有关的操作都存在宽字节注入。
+
+
+### 跟读首页文件
+
+打开首页文件index.php
+```php
+if(!file_exists(dirname(__FILE__).'/data/install.lock')) header("Location:install/index.php");
+define('IN_QISHI', true);
+$alias="QS_index";
+require_once(dirname(__FILE__).'/include/common.inc.php');
+```
+
+首先判断锁文件(install.lock)是否存在，若不存着则跳转到install/index.php,，接着包含/include/common.inc.php文件。跟进文件可以看到
+
+```php
+require_once(QISHI_ROOT_PATH.'data/config.php');
+header("Content-Type:text/html;charset=".QISHI_CHARSET);
+require_once(QISHI_ROOT_PATH.'include/common.fun.php');
+require_once(QISHI_ROOT_PATH.'include/74cms_version.php');
+```
+
+可以看见common.inc.php包含了三个文件。data/config.php为数据库配置文件，include/common.fun.php文件为基础函数库文件，include/74cms_version.php为应用版本文件。接着往下看。
+
+```php
+if (!empty($_GET))
+{
+$_GET  = addslashes_deep($_GET);
+}
+if (!empty($_POST))
+{
+$_POST = addslashes_deep($_POST);
+}
+$_COOKIE   = addslashes_deep($_COOKIE);
+$_REQUEST  = addslashes_deep($_REQUEST);
+```
+
+这段代码调用了include/common.fun.php文件里面的addslashes_deep()函数对GET/POST/COOKIE参数进行了过滤。继续往下看有一个包含文件的操作。
+
+```php
+require_once(QISHI_ROOT_PATH.'include/tpl.inc.php');
+```
+
+跟进tpl.inc.php文件
+```php
+include_once(QISHI_ROOT_PATH.'include/template_lite/class.template.php');
+$smarty = new Template_Lite; 
+$smarty -> cache_dir = QISHI_ROOT_PATH.'temp/caches/'.$_CFG['template_dir'];
+$smarty -> compile_dir =  QISHI_ROOT_PATH.'temp/templates_c/'.$_CFG['template_dir'];
+$smarty -> template_dir = QISHI_ROOT_PATH.'templates/'.$_CFG['template_dir'];
+$smarty -> reserved_template_varname = "smarty";
+$smarty -> left_delimiter = "{#";
+$smarty -> right_delimiter = "#}";
+$smarty -> force_compile = false;
+$smarty -> assign('_PLUG', $_PLUG);
+$smarty -> assign('QISHI', $_CFG);
+$smarty -> assign('page_select',$page_select);
+```
+
+开头包含了include/template_lite/calss.template.php文件。这是一个映射程序模板的类，往下分析，可见这段代码实例化了这个模板类对象赋值给$smarty。回到index.php分析。
+
+```php
+if(!$smarty->is_cached($mypage['tpl'],$cached_id))
+{
+require_once(QISHI_ROOT_PATH.'include/mysql.class.php');
+$db = new mysql($dbhost,$dbuser,$dbpass,$dbname);
+unset($dbhost,$dbuser,$dbpass,$dbname);
+$smarty->display($mypage['tpl'],$cached_id);
+}
+else
+{
+$smarty->display($mypage['tpl'],$cached_id);
+}
+unset($smarty);
+?>
+```
+
+判断是否已经缓存，然后调用display函数输出页面。
+
+## 根据功能点定向审计
+
+黑盒审计(寻找功能点)+白盒审计
+
+几个常见的功能点
+- 文件上传功能
+- 文件管理功能
+- 登录认证功能
+- 找回密码功能
+
+以上功能点的漏洞需要多读代码积累经验
+
+### BugFree重装漏洞案例
+
+## 漏洞挖掘与防范
+
+### SQL注入漏洞
+#### 普通注入
+- 普通注入: int型与string型
+
+### 编码注入
+- 宽字节注入
+- 二次urldecode注入
+	- urldecode
+	- rawurldecode
+
+### 漏洞防范
+- gpc/rutime 魔术引号
+	- magic_quotes_gpc对GET、POST、COOKIE的值过滤
+	- magic_quotes_runtime对数据库或者文件中获取的数据进行过滤
+
+以上只对单引号 双引号 反斜杆以及空字符过滤，对int型注入无太大作用。
+
+- 过滤函数和类
+	- 程序入口统一过滤
+	- 在SQL语句之前使用
+
+	- addslashes函数(作用和gpc一样)，大多用在程序的入口。
+		- 只对string类型有效，数组可以绕过
+
+	- `mysql_[real_]escape_string`函数
+	- intval等字符转换
+- PDO prepare预编译
+
+## XSS漏洞
+- 关键点：寻找没有被过滤的参数，且这些参数传入到输出函数。
+- 常用的输出函数列表如下：
+	- print、print_r、echo、printf、sprinf、die、var_dump、var_export
+- 出现点:
+	- 文章发表、评论回复、留言以及资料设置
+
+### 反射型XSS
+	- 黑盒测试
+		- 扫描器容易扫出来
+	- 白盒审计
+		- 寻找带有参数的输出函数并根据输出函数对输出内容回溯输入参数，观察是否经过过滤
+### 存储型XSS

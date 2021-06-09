@@ -43,8 +43,18 @@ echo str_replace("world","Peter","Hello world!");
 ?>
 // 把world换成Peter
 ```
-
+## strpos
+查找 "php" 在字符串中第一次出现的位置：
+```php
+<?php
+echo strpos("I love php, I love php too!","php");
+?> 
+// 输出结果为7
+```
 ## preg_replace
 ```
 mixed preg_replace ( mixed $pattern , mixed $replacement , mixed $subject [, int $limit = -1 [, int &$count ]] )
 ```
+
+## unset
+unset() 函数用于销毁给定的变量。

@@ -40,7 +40,8 @@
 - [PHP审计菜鸟一](https://sosly.me/index.php/2018/04/02/php_daimashenji1/)
 - [Duleif-代码审计思维导图](https://www.yuque.com/u399151/urs5gq/bseggs)
 - [PHP笔记代码审计](https://www.kancloud.cn/a173512/php_note/1460405)
-
+- [BugFree重装漏洞案例](https://www.secwalker.com/index.php/archives/8/)
+- [ADog's代码审计](http://foreversong.cn/archives/category/%e4%bb%a3%e7%a0%81%e5%ae%a1%e8%ae%a1)
 ### 审计辅助工具
 - Seay源代码审计系统2.1
 
