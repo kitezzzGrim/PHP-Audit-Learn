@@ -37,15 +37,25 @@
 ### 临时思路
 - [q1ingshan-代码审计-入门-mvc-thinkphp](https://www.evi1s.com/category/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/4/)
 - [审计初步-审计实践](https://github.com/spoock1024/web-security/blob/master/articles/PHP%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%E5%AD%A6%E4%B9%A0.md)
-- [PHP审计菜鸟一](https://sosly.me/index.php/2018/04/02/php_daimashenji1/)
 - [Duleif-代码审计思维导图](https://www.yuque.com/u399151/urs5gq/bseggs)
 - [PHP笔记代码审计](https://www.kancloud.cn/a173512/php_note/1460405)
 - [BugFree重装漏洞案例](https://www.secwalker.com/index.php/archives/8/)
-- [ADog's代码审计](http://foreversong.cn/archives/category/%e4%bb%a3%e7%a0%81%e5%ae%a1%e8%ae%a1)
+- [ADog's代码审计](http://foreversong.cn/archives/387)
+- [akger代码审计](https://www.cnblogs.com/akger/p/14865567.html)
+- [corgi代码审计](https://www.yuque.com/corgi/so4wby/ylr082)
+- [代码审计入门-高级审计-框架审计](https://www.hacking8.com/MiscSecNotes/php/audio.html)
+- [pbootcms漏洞合集审计MVC](https://www.yuque.com/pmiaowu/bfgkkh/eh4wl7)
+- [代码审计之mvc架构pbootcms](https://yanmie-art.github.io/2021/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%E4%B9%8Bmvc%E6%9E%B6%E6%9E%84pbootcms/)
 ### 审计辅助工具
 - Seay源代码审计系统2.1
 
 ### PDF 
 - PHP代码审计-培训教材
 - 代码审计-企业级Web代码安全架构
-- [代码审计-一点儿笔记](https://lorexxar.cn/2015/12/21/dmsj-book/)
+- [代码审计-一点儿笔记](https
+
+### 审计过程
+
+dvwa->小众cms-dedecms、wordpress
+https://blog.dyboy.cn/tag/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1
+
