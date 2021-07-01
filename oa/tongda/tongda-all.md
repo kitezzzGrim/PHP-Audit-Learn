@@ -2,7 +2,9 @@
 - [环境准备](#环境准备)
 - [通达部分漏洞信息整合](#通达部分漏洞信息整合)
 - [全局配置说明](#全局配置说明)
-- [弱口令-全版本通杀](#弱口令-全版本通杀)]
+- [弱口令-全版本通杀](#弱口令-全版本通杀)
+- [通达oa11.2](#通达oa11.2)
+    - [11.2后台-getshell](#11.2后台-getshell)
 - [通达oa11.3](#通达oa11.3)
     - [环境准备](#环境准备)
     - [指纹特征-11.3](#指纹特征-11.3)
@@ -18,17 +20,16 @@
 	- [指纹特征-11.6](#指纹特征-11.6)
 	- [任意文件删除&getshell](#任意文件删除&getshell)
 - [通达oa11.7](#通达oa11.7)
-    - [指纹特征-11.7](#指纹特征-11.7)
     - [有效的任意用户登录-管理员在线](#有效的任意用户登录-管理员在线)
 	- [后台SQL注入getshell](#后台SQL注入getshell)
 - [通达oa11.8](#通达oa11.8)
     - [指纹特征-11.8](#指纹特征-11.8)
-    - [11.8后台getshell](11.8后台getshell)
-- [通达oa11.9](#通达oa11.p9)
+    - [11.8后台getshell](#11.8后台getshell)
+- [通达oa11.9](#通达oa11.9)
+    - [11.9后台sql注入](#11.9后台sql注入)
 - [参考文章](#参考文章)
 ## 环境准备
-
-- [通达官网](https://www.tongda2000.com/)
+- [通达oa11.2源码](https://cdndown.tongda2000.com/oa/2019/TDOA11.2.exe)
 - [通达oa11.3源码](https://cdndown.tongda2000.com/oa/2019/TDOA11.3.exe)
 - [通达oa11.6源码](https://cdndown.tongda2000.com/oa/2019/TDOA11.6.exe)
 - [通达oa11.7源码](https://cdndown.tongda2000.com/oa/2019/TDOA11.7.exe)
@@ -122,7 +123,39 @@ http[s]://TongDaOA.domain/module/appbuilder/assets/print.php 任意文件删除
 
 ![image](./img/tongda11.3_2.png)
 
+## 通达oa11.2
+
+## 11.2后台-getshell
+
+**漏洞复现**
+
+admin/空密码
+
+系统管理->附件管理->添加存储目录
+
+![image](./img/tongda11.2_1.png)
+
+在系统管理->系统参数信息->OA服务设置可以看到webroot目录
+
+![image](./img/tongda11.2_2.png)
+
+回到刚才的添加存储目录，我写的`C:/MYOA/webroot`
+
+![image](./img/tongda11.2_3.png)
+
+组织->综合管理部->系统管理员->上传
+
+![image](./img/tongda11.2_4.png)
+
+php被限制上传，但可以利用windows特性点号绕过，刚开始我上传的是简单的一句话木马，但失败了，发现是win10病毒威胁拦截了，于是换了冰蝎木马成功上传。
+
+![image](./img/tongda11.2_5.png)
+
+上传地址：`http://10.30.1.52/im/2106/1547210396.hello.php` 连接即可。
+
+
 ## 通达oa11.3
+
 ## 指纹特征-11.3
 
 ![image](./img/tongda11.3.png)
@@ -361,7 +394,6 @@ V11 / 2013：
 
 ## 通达oa11.6
 
-
 ## 指纹特征-11.6
 
 ![image](./img/tongda11.6_1.png)
@@ -377,10 +409,39 @@ V11 / 2013：
 
 - 该洞有风险，切勿在公网上使用
 
-## 通达oa11.7
-## 指纹特征-11.7
+**漏洞利用**
 
-跟11.6差不多
+**代码分析**
+
+漏洞点在`\webroot\module\appbuilder\assets\print.php`
+
+```php
+<?php
+
+$s_tmp = __DIR__ . "/../../../../logs/appbuilder/logs";
+$s_tmp .= "/" . $_GET["guid"];
+
+if (file_exists($s_tmp)) {
+    $arr_data = unserialize(file_get_contents($s_tmp));
+    unlink($s_tmp);
+    $s_user = $arr_data["user"];
+}
+else {
+    echo "未知参数";
+    exit();
+}
+```
+
+可以看到可控变量guid被拼接到`$s_tmp`里，file_exists判断`$s_tmp`文件是否存在，存在则赋值给`$arr_data`然后unlink删掉。从而造成任意文件删除漏洞。通过此漏洞来删除/webroot/inc/auth.inc.php的认证文件，从而达到未授权上传。
+
+![image](./img/tongda11.6_3.png)
+
+上传点在`general\data_center\utils\upload.php`文件，可以看到包含了`auth.inc.php`认证文件，任意删除就是删除这个文件来执行后续的上传操作的。
+
+具体POC暂不写，有风险。
+
+## 通达oa11.7
+
 ## 有效的任意用户登录-管理员在线
 
 **漏洞利用**
@@ -812,6 +873,10 @@ if __name__ == '__main__':
     test(target_url,cookie)
     Upload_Ini(target_url,cookie)
 ```
+
+## 通达oa11.9
+
+## 11.9后台sql注入
 
 
 ## 参考文章
