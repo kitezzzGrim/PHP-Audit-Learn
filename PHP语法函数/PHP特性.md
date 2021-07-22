@@ -7,6 +7,7 @@
 - [PHP引号解析问题](#PHP引号解析问题)
 - [PHP引用&](#PHP引用&)
 - [public&&private&&protected](#public&&private&&protected)
+- [namespace&&use](#namespace&&use])
 
 - [ini_get_all](#ini_get_all)
     - [disable_functions](#disable_functions)
@@ -65,7 +66,13 @@ var_dump($b); // int(42)
 - private表示私有的，只有本类内部可以使用；
 - protected表示受保护的，只有本类或子类或父类中可以访问
 
+# namespace&&use
 
+命名空间一个最明确的目的就是解决重名问题，PHP中不允许两个函数或者类出现相同的名字，否则会产生一个致命的错误。
+
+use,使用某个命名空间内的所有函数名、
+
+https://www.cnblogs.com/beili/p/8670418.html
 # ini_get_all
 获取所有已注册的配置选项
 

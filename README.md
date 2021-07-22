@@ -7,12 +7,7 @@
 - 项目地址：[kitezzzGrim/PHP-Audit-Learn](#kitezzzGrim/PHP-Audit-Learn)
 
 
-### Todo
-- [x] bluecms代码审计
-- [x] PHP代码审计分段详解
-- [ ] 代码审计 企业级Web代码安全架构 学习
-- [ ] PHP代码审计-培训教材
-- [ ] 暂定
+
 
 
 ### 案例文库
@@ -45,7 +40,7 @@
 - [corgi代码审计](https://www.yuque.com/corgi/so4wby/ylr082)
 - [代码审计入门-高级审计-框架审计](https://www.hacking8.com/MiscSecNotes/php/audio.html)
 - [pbootcms漏洞合集审计MVC](https://www.yuque.com/pmiaowu/bfgkkh/eh4wl7)
-- [代码审计之mvc架构pbootcms](https://yanmie-art.github.io/2021/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%E4%B9%8Bmvc%E6%9E%B6%E6%9E%84pbootcms/)
+- [PHP代码审计及Thinkphp框架审计（完整版）](https://www.bilibili.com/video/BV1Z4411m7Uf?p=16)
 ### 审计辅助工具
 - Seay源代码审计系统2.1
 
