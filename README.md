@@ -1,11 +1,12 @@
 ## PHP-Audit-Learn
-> 以下内容记录代码审计学习之旅
+> 以下内容记录PHP代码审计学习之旅
 
 - 简介: 2021年5月28日风筝成立代码审计笔记。
 - 定位：个人维护的代码审计知识框架
 - 更新时间：每日不定期
 - 项目地址：[kitezzzGrim/PHP-Audit-Learn](#kitezzzGrim/PHP-Audit-Learn)
 
+![](./img/b.jpg)
 
 
 
